@@ -1,0 +1,7 @@
+apiVersion: task.a-cool-name.io/v1
+kind: Backup
+metadata:
+  name: trigger-a-backup-job
+spec:
+  name: "Do something"
+  type: "job"

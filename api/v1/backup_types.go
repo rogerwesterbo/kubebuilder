@@ -25,21 +25,52 @@ import (
 
 // BackupSpec defines the desired state of Backup
 type BackupSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Name of the backup
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
 
-	// Foo is an example field of Backup. Edit backup_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Type of backup ("job", "cronjob")
+	// +kubebuilder:validation:Required
+	Type BackupType `json:"type"` // cronjob, job
+
+	// Schedule of the backup ex: "0 0 * * *", run every day at midnight
+	//
+	// required if Type is set to "cronjob", see https://crontab.guru/ for more information
+	Schedule string `json:"schedule,omitempty"`
 }
 
 // BackupStatus defines the observed state of Backup
 type BackupStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Phase of the backup
+	Phase BackupPhase `json:"phase,omitempty"`
+
+	// Conditions of the backup
+	Conditions []BackupCondition `json:"conditions,omitempty"`
+}
+
+type BackupCondition struct {
+	// Status of the condition, one of True, False, Unknown.
+	Status string `json:"status,omitempty"` // True, False, Unknown
+
+	// Type (Ready, Failed)
+	Type string `json:"type,omitempty"` // Ready, Failed
+
+	// Last time the condition transitioned from one status to another.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
+
+	// Message about the condition for a better understanding
+	Message string `json:"message,omitempty"`
+
+	// Reason for the backup
+	Reason string `json:"reason,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Name",type=string,JSONPath=`.spec.name`
+//+kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`
+//+kubebuilder:printcolumn:name="Schedule",type=string,JSONPath=`.spec.schedule`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // Backup is the Schema for the backups API
 type Backup struct {

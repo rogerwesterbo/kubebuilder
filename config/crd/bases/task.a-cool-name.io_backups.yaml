@@ -14,7 +14,20 @@ spec:
     singular: backup
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.name
+      name: Name
+      type: string
+    - jsonPath: .spec.type
+      name: Type
+      type: string
+    - jsonPath: .spec.schedule
+      name: Schedule
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
         description: Backup is the Schema for the backups API
@@ -34,13 +47,50 @@ spec:
           spec:
             description: BackupSpec defines the desired state of Backup
             properties:
-              foo:
-                description: Foo is an example field of Backup. Edit backup_types.go
-                  to remove/update
+              name:
+                description: Name of the backup
                 type: string
+              schedule:
+                description: "Schedule of the backup ex: \"0 0 * * *\", run every
+                  day at midnight \n required if Type is set to \"cronjob\", see https://crontab.guru/
+                  for more information"
+                type: string
+              type:
+                description: Type of backup ("job", "cronjob")
+                type: string
+            required:
+            - name
+            - type
             type: object
           status:
             description: BackupStatus defines the observed state of Backup
+            properties:
+              conditions:
+                description: Conditions of the backup
+                items:
+                  properties:
+                    lastUpdateTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Message about the condition for a better understanding
+                      type: string
+                    reason:
+                      description: Reason for the backup
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type (Ready, Failed)
+                      type: string
+                  type: object
+                type: array
+              phase:
+                description: Phase of the backup
+                type: string
             type: object
         type: object
     served: true

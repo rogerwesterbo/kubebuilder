@@ -1,0 +1,8 @@
+apiVersion: task.a-cool-name.io/v1
+kind: Backup
+metadata:
+  name: trigger-a-cron-backup
+spec:
+  name: "Do something on a schedule"
+  type: "cronjob"
+  schedule: "*/2 * * * *"
